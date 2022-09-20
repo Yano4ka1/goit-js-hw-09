@@ -12,20 +12,20 @@
 import {Notify} from 'notiflix/build/notiflix-notify-aio';
 
 const refs = {
-form: document.querySelector('.form')};
-
+  form: document.querySelector('.form')
+}
 
 refs.form.addEventListener('submit', onSubmit);
 
 function onSubmit(evn) {
-  evn.preventDefaut();
+  evn.preventDefault();
 
   const {
     elements: {
-    delay,
-    step, 
-    amount
-  }
+      delay,
+      step,
+      amount,
+    }
   } = evn.target;
 
   let promiseDelay = Number(delay.value);
@@ -40,23 +40,22 @@ function onSubmit(evn) {
 
 function createPromise(position, delay) {
   return new Promise((resolve, reject) => {
-  const shouldResolve = Math.random() > 0.3;
+    const shouldResolve = Math.random() > 0.3;
     
     setTimeout(() => {
-    if (shouldResolve) {
-      resolve({position, delay})
-    }
-      else {
+      if (shouldResolve) {
+        resolve({position, delay})
+      } else {
         reject({position, delay})
       }
-      }, delay)
-    })
-  }
+    }, delay)
+  })
+}
 
 function onPromiseSuccess({ position, delay }) {
   Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`); 
 }
 
 function onPromiseError({ position, delay }) {
-  Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`); 
+  Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
 }

@@ -24,13 +24,45 @@ const options = {
     defaultDate: new Date(),
     minuteIncrement: 1,
 
+
+    onReady() {
+        refs.btnStart.setAttribute('disabled', true);
+    },
+
     onClose(selectedDates) {
-      console.log(selectedDates[0]);
+        dateTime = selectedDates[0].getTime();
+
+      if (dateTime <= Date.now()) {
+        Notify.failure('Please choose a date in the future');
+        refs.btnStart.setAttribute('disabled', true);
+        this.open();
+        return;
+      }
+
+      if (refs.btnStart.hasAttribute('disabled')) {
+        Notify.success('Everything is OK. You can get started countdown'); 
+        refs.btnStart.removeAttribute('disabled');
+      }
     },
   };
 
+  refs.btnStart.addEventListener('click', onStartBtnClick)
 
+  flatpickr('#datetime-picker', options);
 
+  function onStartBtnClick() {
+    refs.btnStart.setAttribute('disabled', true);
+  
+    const intervalId = setInterval(() => {
+      if ((dateTime - Date.now()) < 0) {
+        clearInterval(intervalId);
+        return;
+        }
+  
+      const timeToSelectedDate = convertMs(dateTime - Date.now());
+      countDown(timeToSelectedDate);
+    }, 1000)
+  }
 
   function convertMs(ms) {
     // Number of milliseconds per unit of time
@@ -54,3 +86,14 @@ const options = {
   console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
   console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
   console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
+
+  function addLeadingZero(value) {
+    return String(value).padStart(2, 0);
+  }
+
+  function countDown ({days, hours, minutes, seconds}) {
+    refs.dataDays.textContent = addLeadingZero(days);
+    refs.dataHours.textContent = addLeadingZero(hours);
+    refs.dataMinutes.textContent = addLeadingZero(minutes);
+    refs.dataSeconds.textContent = addLeadingZero(seconds);
+  }
